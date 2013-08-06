@@ -1,0 +1,45 @@
+{namespace, "ecsd://rytong.com/conf/ewp"}.
+{anotation, [{name, "Ewp Config"},{docstring, "something"}]}.
+
+{typedef, {string_or_atom, [string, atom]}}.
+
+{element, [{anotation, [{name, "mobile_resolution"},
+                        {docstring, "xxx"},
+                        {type, tuple},
+                        {use, requied}
+                       ]
+           },
+           {element, [{anotation, [{type, const}, {value, channel}]}]},
+           {element, [{anotation, [{name, "name"},
+                                   {docstring, "sth"},
+                                   {type, string_or_atom}
+                                  ]
+                      }]}
+          ]
+}.
+
+
+{element, [{anotation, [{name, "collection"},
+                        {docstring, "doc here"},
+                        {type, list}
+                       ]
+           },
+           {element, [{anotation, [{name, "list"},
+                                   {docstring, "doc sth"},
+                                   {type, list}]
+                      }]},
+           {element, [{anotation, [{name, "last"},
+                                   {docstring, "doc last"},
+                                   {type, atom}]}]}
+          ]
+}.
+
+
+{element, [{anotation, [{name, "menu"},
+                        {docstring, "doc xxx"},
+                        {type, string}
+                       ]
+           }
+          ]
+}.
+
