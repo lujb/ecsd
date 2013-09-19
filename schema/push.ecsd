@@ -1,0 +1,37 @@
+%% Simple Types: atom/string/integer/boolean/any/union/path
+%% Complex Types:list/tuple(fixed list)
+%% Expr: oneof/onlywhen
+{namespace, "ecsd://rytong.com/conf/push"}.
+{annotation, [{name, "Push Config"},{docstring, "push config file"}]}.
+
+
+{element, [{annotation, [{type, tuple},
+                        {name, "app_push"},
+                        {repeat, {1, n}},
+                        {value, list}]},
+           {element, [{annotation, [{tag, ios},
+                                   {type, tuple},
+                                   {repeat, {0,1}},
+                                   {value, list}]},
+                      {element, [{annotation, [{tag, certfile},{type, tuple}, {value, string}]}]},
+                      {element, [{annotation, [{tag, keyfile},{type, tuple}, {value, string}]}]},
+                      {element, [{annotation, [{tag, poolsize},{type, tuple}, {value, integer}]}]},
+                      {element, [{annotation, [{tag, feedback},{type, tuple}, {value, integer}]}]},
+                      {element, [{annotation, [{tag, env},{type, tuple}, {value, {oneof,[development,
+                                                                                        production]}}]}]}
+                      ]},
+           {element, [{annotation, [{tag, andoid},
+                                   {type, tuple},
+                                   {repeat, {0,1}},
+                                   {value, list}]},
+                      {element, [{annotation, [{tag, xmpp_host},{type, tuple}, {value, string}]}]}
+                      ]},
+           {element, [{annotation, [{tag, winphone},
+                                   {type, tuple},
+                                   {repeat, {0,1}},
+                                   {value, list}]},
+                      {element, [{annotation, [{tag, client_id},{type, tuple}, {value, string}]}]},
+                      {element, [{annotation, [{tag, client_secret},{type, tuple}, {value, path}]}]}
+                      ]}
+]}.
+

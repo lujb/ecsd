@@ -1,0 +1,105 @@
+%% Simple Types: atom/string/integer/boolean/term/union
+%% Complex Types:list/tuple(fixed list)
+%% Expr: oneof/onlywhen
+{namespace, "ecsd://rytong.com/conf/adapter"}.
+{annotation, [{name, "Adapter Config"},{docstring, "adapter config file"}]}.
+
+% {typedef, {return_type, [xml, json, tuplelist]}}.
+
+
+{element, [{annotation, [{type, tuple},
+                        {name, "adapter"},
+                        {docstring, "adapter doc"},
+                        {repeat, {1,n}},
+                        {tag, adapter},
+                        {value, list}]},
+          {element, [{annotation, [{name, "name"},
+                                  {type, tuple},
+                                  {tag, name},
+                                  {value, string}
+                                  ]}]},
+          {element, [{annotation, [{name, "host"},
+                                  {type, tuple},
+                                  {tag, host},
+                                  {value, string}
+                                  ]}]},
+          {element, [{annotation, [{name, "protocol"},
+                                  {type, tuple},
+                                  {tag, protocol},
+                                  {value, {oneof, [http,
+                                                   {element, [{annotation, [{type, tuple},
+                                                                           {tag, rpc},
+                                                                           {value, tuple}]},
+                                                              {element, [{annotation,[{name, "node"},
+                                                                                     {type, atom}]}]},
+                                                              {element, [{annotation,[{name, "module"},
+                                                                                     {type, atom}]}]},
+                                                              {element, [{annotation,[{name, "function"},
+                                                                                     {type, atom}]}]}
+                                                             ]},
+                                                   {element, [{annotation, [{type, tuple},
+                                                                           {tag, socket},
+                                                                           {value, tuple}]},
+                                                              {element, [{annotation,[{name, "module"},
+                                                                                     {type, atom}]}]},
+                                                              {element, [{annotation,[{name, "function"},
+                                                                                     {type, atom}]}]}]},
+                                                   {element, [{annotation, [{type, tuple},
+                                                                           {tag, extend},
+                                                                           {value, tuple}]},
+                                                              {element, [{annotation,[{name, "module"},
+                                                                                     {type, atom}]}]},
+                                                              {element, [{annotation,[{name, "function"},
+                                                                                     {type, atom}]}]}]}
+                                                                                     ]}}
+                                  ]}]},
+          {element, [{annotation, [{name, "port"},
+                                  {type, tuple},
+                                  {tag, port},
+                                  {onlywhen, {"protocol", in, [http, tcp]}},
+                                  {value, integer}
+                                  ]}]},
+          {element, [{annotation, [{type, tuple},
+                                  {tag, return_type},
+                                  {value, {oneof, [xml, json, tuplelist]}}
+                                  ]}]}
+]}.
+
+{element, [{annotation, [{type, tuple},
+                        {tag, procedure},
+                        {repeat, {0,n}},
+                        {onlywhen, {"adapter", exist}},
+                        {value, list}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, id},
+                                   {value, string}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, adapter},
+                                   {value, {oneof, {"adapter", list}}}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, return_type},
+                                   {value, {oneof, [xml, json, tuplelist]}}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, path},
+                                   {value, string}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, gen_log},
+                                   {value, boolean}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, use_sample_data},
+                                   {value, boolean}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, data_sample},
+                                   {value, string}]}]},
+           {element, [{annotation, [{type, tuple},
+                                   {tag, parameters},
+                                   {value, list}]},
+                      {element, [{annotation, [{type, tuple},
+                                              {name, "param"},
+                                              {repeat, {0,n}}]},
+                                 {element, [{annotation, [{name, "key"},{value, string_or_atom}]}]},
+                                 {element, [{annotation, [{name, "value"},{value, string_or_atom}]}]}
+                      ]}
+           ]}
+]}.
+

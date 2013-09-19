@@ -1,6 +1,7 @@
 -module(ecsd_server).
 -behaviour(gen_server).
 
+-include("include/ecsd.hrl").
 
 %% API
 -export([start/0]).
@@ -23,25 +24,6 @@
 -compile([export_all]).
 
 
--record(schema, {
-    namespace,
-    anotation,
-    elements,
-    location
-    }).
-
--record(anotation, {
-    name,
-    docstring,
-    type,
-    use,
-    value
-    }).
-
--record(element, {
-    anotation,
-    elements
-    }).
 
 -record(state, {index}).
 
@@ -88,7 +70,7 @@ handle_call(stop, _From, State) ->
 handle_call({insert, FileName}, _From, #state{index = I} = State) ->
     Schema = load_schema(FileName),
     NS = Schema#schema.namespace,
-    Name = Schema#schema.anotation#anotation.name,
+    Name = Schema#schema.annotation#annotation.name,
     Resp = 
         case ets:insert_new(?TABLE, Schema) of
             true -> ok;
@@ -134,19 +116,22 @@ load_schema(FileName) when is_list(FileName) ->
 do_load_schema(L) when is_list(L) ->
     #schema{
         namespace = parse_ns(proplists:get_value(namespace, L)),
-        anotation = parse_anot(proplists:get_value(anotation, L)), 
+        annotation = parse_anot(proplists:get_value(annotation, L)), 
         elements = parse_ele(proplists:lookup_all(element, L)) 
     }.
 
 parse_ns(NS) when is_list(NS), is_integer(hd(NS)) -> NS.
 
 parse_anot(Anots) when is_list(Anots) ->
-    #anotation{
+    #annotation{
         name = proplists:get_value(name, Anots), 
         docstring = proplists:get_value(docstring, Anots), 
         type = proplists:get_value(type, Anots), 
+        tag = proplists:get_value(tag, Anots), 
         use = proplists:get_value(use, Anots), 
-        value = proplists:get_value(value, Anots) 
+        repeat = proplists:get_value(repeat, Anots), 
+        onlywhen = proplists:get_value(onlywhen, Anots), 
+        value = parse_value(proplists:get_value(value, Anots))
     }.  
 
 parse_ele(Elements) when is_list(Elements) ->
@@ -156,7 +141,25 @@ parse_ele([], Acc) ->
     lists:reverse(Acc); 
 parse_ele([{element, Data} | Rest], Acc) ->
     Ele = #element{
-        anotation = parse_anot(proplists:get_value(anotation, Data)),
-        elements = parse_ele(proplists:lookup_all(element, Data))},
+        annotation = parse_anot(proplists:get_value(annotation, Data)),
+        children = parse_ele(proplists:lookup_all(element, Data))},
+    parse_ele(Rest, [Ele | Acc]);
+parse_ele([Constant | Rest], Acc) ->
+    Ele = #element{
+        annotation = #annotation{
+            type = constant,
+            value = Constant
+        }
+    },
     parse_ele(Rest, [Ele | Acc]).
+
+parse_value({oneof, Elements}) when is_list(Elements) ->
+    #oneof{children = parse_ele(Elements)};
+parse_value({oneof, {EleName, list}}) when is_list(EleName), is_integer(hd(EleName)) ->
+    #oneof{
+        type = list,
+        children = EleName
+    };
+parse_value(ValueType) ->
+    ValueType.
 
