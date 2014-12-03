@@ -9,9 +9,7 @@
   "author": "lujb",
   "license": "MIT",
   "dependencies": {
-    "colors": "^1.0.3",
     "debug": "^2.0.0",
-    "erlang-conf": "git://github.com/lujb/erlang-conf",
     "underscore": "^1.7.0"
   }
 }
