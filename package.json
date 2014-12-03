@@ -1,0 +1,17 @@
+{
+  "name": "ecsd",
+  "version": "0.1.0",
+  "description": "Erlang conf schema definition",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lujb",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.0.3",
+    "debug": "^2.0.0",
+    "erlang-conf": "git://github.com/lujb/erlang-conf",
+    "underscore": "^1.7.0"
+  }
+}
