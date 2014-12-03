@@ -2,7 +2,7 @@ var _ = require('underscore');
 var assert = require('assert');
 var debug = require('debug')('DEBUG');
 
-require('colors');
+// require('colors');
 
 var context = {};
 context.frames = [];
@@ -13,8 +13,9 @@ context.possibleError = { frames:[] };
 
 
 // api
-function validate(specs, input) {
+function validate(specs, input, cb) {
   var pass = _validate(specs, input);
+  var err = null;
 
   if (pass) {
     assert.equal(context.frames.length, 0);
@@ -22,10 +23,11 @@ function validate(specs, input) {
     assert.equal(context.possibleError.frames.length, 0);
   } else {
     // report error
-    reportError();    
+    var err = reportError();    
   }
 
-  return pass;
+  if (cb) cb(err);
+  else return pass;
 }
 
 // validating `input` using `specs`
@@ -724,18 +726,28 @@ function reportError() {
   assert.equal(errorSize > 0, true);
   var errorFrame = context.possibleError.frames.pop();
   var stain = sanitize(errorFrame.item);
-  var msg = ('Line ' + stain.line + ', Col ' + stain.column + ': ').red +
-      stain.raw.grey + ', Should be:'.green;
+  // var msg = ('Line ' + stain.line + ', Col ' + stain.column + ': ').red +
+  //     stain.raw.grey + ', Should be:'.green;
 
-  console.log(msg);
+  var err = {
+    line: stain.line,
+    column: stain.column,
+    stain: stain.raw,
+    forms: []
+  }
+
+  // console.log(msg);
 
   while (true) {
     if (!errorFrame) {
       break;
     }
-    console.log(errorFrame.spec);
+    err.forms.push(errorFrame.spec);
+    // console.log(errorFrame.spec);
     errorFrame = context.possibleError.frames.pop();
   }
+
+  return err;
 }
 
 function debugBegin(type) {
