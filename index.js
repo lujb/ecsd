@@ -9,7 +9,8 @@ context.frames = [];
 context.probes = 0;
 context.possibleError = { frames:[] };
 
-
+var _v = {}; // validators
+var _s = {}; // sanitizer
 
 
 // api
@@ -68,7 +69,7 @@ function doValidate(spec) {
 }
 
 
-function validateTaggedValue(item) {
+_v.validateTaggedValue = function(item) {
   var result = false;
   var checked =
     item.type === 'tuple' &&
@@ -85,7 +86,7 @@ function validateTaggedValue(item) {
   return result;
 }
 
-function validateSimpleList(item) {
+_v.validateSimpleList = function(item) {
   var result = false;
   var checked =
     item.type === 'list' &&
@@ -110,7 +111,7 @@ function validateSimpleList(item) {
   return result;
 }
 
-function validateList(item) {
+_v.validateList = function(item) {
   var result = false;
   var checked =
     item.type === 'list' &&
@@ -127,7 +128,7 @@ function validateList(item) {
   return result;
 }
 
-function validateTuple(item) {
+_v.validateTuple = function(item) {
   var result = false;
   var checked =
     item.type === 'tuple' &&
@@ -160,13 +161,13 @@ function validateTuple(item) {
   return result;
 }
 
-function validateInteger(item) {
+_v.validateInteger = function(item) {
   var result = typeof item[0] === 'number';
 
   return result;
 }
 
-function validateAtom(item) {
+_v.validateAtom = function(item) {
   var result = false;
   var checked = item.type === 'atom';
 
@@ -183,14 +184,14 @@ function validateAtom(item) {
   return result;
 }
 
-function validateBoolean(item) {
+_v.validateBoolean = function(item) {
   var result = item.type === 'atom' &&
     item[0] === 'true' || item[0] === 'false';
 
   return result;
 }
 
-function validateString(item) {
+_v.validateString = function(item) {
   debug('start validating string..');
   var result = item.type === 'string' && item.length === 1;
 
@@ -281,7 +282,7 @@ function parseAltValue(term, value) {
   }
 }
 
-function sanitizeTuple(item, recursive) {
+_s.sanitizeTuple = function(item, recursive) {
   var stash = [];
 
   for (var i=0; i<item.length; i++) {
@@ -298,7 +299,7 @@ function sanitizeTuple(item, recursive) {
   return out;
 }
 
-function sanitizeList(item, recursive) {
+_s.sanitizeList = function(item, recursive) {
   var stash = [];
   var len = item.length;
   var mass = false;
@@ -326,11 +327,11 @@ function sanitizeList(item, recursive) {
   return out;
 }
 
-function sanitizeInteger(item) {
+_s.sanitizeInteger = function(item) {
   return item[0] + '';
 }
 
-function sanitizeAtom(item) {
+_s.sanitizeAtom = function(item) {
   var atom;
   if (item.quoted) {
     atom = "'" + item[0] + "'";
@@ -341,7 +342,7 @@ function sanitizeAtom(item) {
   return atom;
 }
 
-function sanitizeString(item) {
+_s.sanitizeString = function(item) {
   return '"' + item[0] + '"';
 }
 
@@ -603,7 +604,7 @@ function validator(key) {
   });
   key.unshift('validate');
 
-  var fun = eval(key.join(''));
+  var fun = _v[key.join('')];
 
   assert(typeof fun, 'function');
   return fun;
@@ -622,7 +623,7 @@ function sanitize(item) {
 }
 
 function sanitizer(type) {
-  var fun= eval('sanitize' + capitalise(type));
+  var fun= _s['sanitize' + capitalise(type)];
 
   assert.equal(typeof sanitizer, 'function');
   return fun;
