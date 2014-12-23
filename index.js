@@ -193,7 +193,18 @@ _v.validateBoolean = function(item) {
 
 _v.validateString = function(item) {
   debug('start validating string..');
-  var result = item.type === 'string' && item.length === 1;
+  var result = false;
+  var checked = item.type === 'string' && item.length === 1;
+
+  if (checked) {
+    if (this.altval) {
+      result = _.some(this.altval, function(v) {
+        return (v.type === 'string') && (v[0] === item[0]);
+      })
+    } else {
+      result = typeof item[0] === 'string';
+    }
+  }
 
   debug('end validating string..', result);
   return result;
